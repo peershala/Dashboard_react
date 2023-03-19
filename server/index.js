@@ -8,7 +8,6 @@ const cors=require('cors')
 const filestore = require("session-file-store")(session)
 require('dotenv').config();
 
-app.use(express.static(path.join(__dirname, '/client')))
 app.use(cors());
 app.use(express.urlencoded({extended:true}))
 app.use(session({
@@ -19,7 +18,7 @@ app.use(session({
 }));
 
 app.use((req,res,next)=>{
-    console.log(req.body,req.sessionID);
+    console.log(req.body,"session-> ",req.session);
     next();
 })
 
@@ -51,40 +50,6 @@ console.log('Connected to the MySQL server.');
 // });
 
 
-// app.get("/login",(req,res)=>
-// {
-//   res.sendFile('login.html',{root:__dirname+'/client/pages'});
-// });
-
-
-// app.get("/register",(req,res)=>
-// {
-//     res.sendFile('register.html',{root:__dirname+'/client/pages'});
-// });
-
-app.get("/forgot-password",(req,res)=>
-{
-    res.sendFile('forgot-password.html',{root:__dirname+'/client/pages'});
-});
-
-
-app.get("/aboutus",(req,res)=>
-{
-    res.sendFile('aboutus.html',{root:__dirname+'/client/pages'});
-});
-
-app.get("/achievement",(req,res)=>
-{
-    console.log('asking  achievement permision..');
-    if(!req.session.user_id){
-        console.log('NOT LOGGED IN');
-        res.redirect('/login');
-    }
-    else{
-        res.sendFile('achievement.html',{root:__dirname+'/client/pages'});
-    }
-});
-
 app.post('/register',async(req,res)=>{
 
     const {username,password,fname,lname}=req.body;
@@ -96,14 +61,12 @@ app.post('/register',async(req,res)=>{
         if(err)
         {
             console.log(err);
-            res.send(err);
-            // return err;
+            res.sendStatus(403);
         }
         if(result.length!=0)
         {
             console.log('Username already exists');
             res.sendStatus(400)
-            // res.redirect('/register');
         }
         else{
             const values=[username,hash,fname,lname];
@@ -115,8 +78,8 @@ app.post('/register',async(req,res)=>{
                     console.log(err);
                     res.redirect('/register')
                 }
+                // console.log("result ",result);
                 console.log('Account created for ',username);
-                // res.redirect('/login')
                 res.sendStatus(200);
             })
         }
@@ -133,14 +96,13 @@ app.post('/login',async(req,res)=>{
         if(err)
         {
             console.log(err);
-            res.redirect('/login');
-            // res.sendStatus(404);
+            res.sendStatus(404);
         }
 
         if(result.length==0)
         {
             console.log('WRONG USERNAME OR PASSWORD');
-            res.redirect('/login')
+            res.redirect(403);
         }
         else{
             var userId=result[0].id || 0;
@@ -149,14 +111,11 @@ app.post('/login',async(req,res)=>{
                 if(validuser)
                 {
                     req.session.user_id=userId;
-                    console.log('innn valid');
+                    console.log("valid",req.session);
                     res.sendStatus(200);
-                    // res.redirect('/dashboard')
                 }
                 else{
                     console.log('WRONG USERNAME OR PASSWORD');
-                    // res.redirect('/login')
-                    // res.sendStatus(200);
                     res.sendStatus(403);
                 }
             }
@@ -175,19 +134,18 @@ app.get('/dashboard',(req,res)=>{
     if(!req.session.user_id){
         console.log('NOT LOGGED IN');
         res.sendStatus(401);
-        // res.redirect('/login');
     }
     else{
         res.sendStatus(200);
-        // res.sendFile('dashboard.html',{root:__dirname+'/client/pages'})
     }
 })
 
 
 app.get('*',(req,res)=>{
-    res.sendFile('404.html',{root:__dirname+'/client/pages'})
-    // res.redirect('/login');
+    res.sendStatus(404);
 })
+
+
 
 const port=process.env.PORT || 8880;
 

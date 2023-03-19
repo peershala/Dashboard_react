@@ -22,6 +22,7 @@ function Login() {
   const navigate = useNavigate()
 
   const [loginthememode, setloginThememode] = useState(false)
+  // const []
 
   const toggleTheme = () => {
     loginthememode === false ? setloginThememode(true) : setloginThememode(false)
@@ -64,6 +65,14 @@ function Login() {
       }
     },
   });
+
+  function handleSubmit()
+  {
+    // e.preventDefault();
+    console.log("clicked");
+
+
+  }
 
 
   return (
@@ -109,7 +118,7 @@ function Login() {
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column", height: "5rem", width: "100%", justifyContent: "space-between" }}>
-            <ColorButton variant="contained" onClick={() => navigate("/dashboard")}>Login</ColorButton>
+            <ColorButton variant="contained" onClick={handleSubmit()}>Login</ColorButton>
             <Link href="#" underline="hover">
               {'Forget Password?"'}
             </Link>
