@@ -1,5 +1,32 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+const UserContext = React.createContext([{}, () => {}])
+
+
+let initialState = {}
+
+
+const UserProvider = props => {
+
+  const [state, setState] = useState(initialState)
+
+
+  return (
+
+    <UserContext.Provider value={[state, setState]}>
+
+      {props.children}
+      {/* <AppProvider/> */}
+
+    </UserContext.Provider>
+
+  )
+
+};
+
+
+
+
 const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
@@ -28,3 +55,4 @@ export const AppState = () => {
 };
 
 export default AppProvider;
+export { UserContext, UserProvider }

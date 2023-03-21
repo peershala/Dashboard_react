@@ -2,13 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import AppProvider from './context/ContextProvider';
+import AppProvider, { UserProvider } from './context/ContextProvider';
+// import { UserProvider } from './context/ContextProvider';
+
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <AppProvider>
-    <App />
-  </AppProvider>
-);
+  <UserProvider>
+    <AppProvider>
+      <App />
+    </AppProvider>
+  </UserProvider>
 
+);

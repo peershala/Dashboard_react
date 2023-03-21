@@ -1,5 +1,5 @@
 import { Box, Button } from '@mui/material'
-import React from 'react'
+import React,{useContext} from 'react'
 import { Outlet, Route, Routes } from 'react-router-dom'
 import { AppState } from '../context/ContextProvider'
 import Achievements from './Achievements/Achievements'
@@ -9,10 +9,13 @@ import AppDrawer from './Navbar/AppDrawer'
 import AppNavbar from './Navbar/AppNavbar'
 import BottomNav from './Navbar/BottomNav'
 import Sidebar from './Navbar/Sidebar'
+import { UserContext } from '../context/ContextProvider'
 
 function Dashboard() {
     const { thememode } = AppState()
+    const [userContext,setContext]=useContext(UserContext);
 
+    console.log('token-> ',userContext.token);
 
     return (
         <Box component="div" sx={{

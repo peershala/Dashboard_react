@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState,useContext, useEffect } from 'react'
 import Box from '@mui/material/Box';
-import { CardMedia, Chip, Divider, Grid, Paper } from '@mui/material';
+import { CardMedia, Chip, Divider, Grid, Input, Paper } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -15,6 +15,8 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { width } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggleButton from './ThemeToggleButton';
+import Axios from 'axios';
+import { UserContext } from '../context/ContextProvider';
 
 function Login() {
 
@@ -22,11 +24,86 @@ function Login() {
   const navigate = useNavigate()
 
   const [loginthememode, setloginThememode] = useState(false)
-  // const []
+  const [usermail,setmail]=useState('');
+  const [userpass,setpass]=useState('');
+  const [userContext,setUserContext]=useContext(UserContext);
+  const genericErrorMessage = "Something went wrong! Please try again later.";
+
 
   const toggleTheme = () => {
     loginthememode === false ? setloginThememode(true) : setloginThememode(false)
   }
+
+  
+  const submitHandler=()=>
+  {
+    console.log("clicked");
+    console.log(usermail);
+
+    console.log(userpass);
+
+
+    // navigate('/dashboard');
+
+    // Axios.post("http://localhost:8880/login",
+    // {username:usermail,
+    // password:userpass
+    // })
+    // .then(async response=>{
+    //   console.log('no error');
+    //   if(response.status==200)
+    //   {
+    //     console.log(response);
+    //     // console.log(response.data.user_id);
+    //     setUserContext(oldValues => {
+    //       return { ...oldValues, token: response.data }
+
+    //     })
+
+    //     try {
+    //       localStorage.setItem("userstore", JSON.stringify(response.data));
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+
+    //   }
+      
+    // })
+    // .catch(error => {
+
+    //   if(error.response)
+    //   if (error.response.status === 400) {
+
+    //     // setError("Please fill all the fields correctly!")
+    //     console.log("Please fill all the fields correctly!")
+
+    //   } else if (error.response.status === 401) {
+
+    //     console.log("Invalid email and password combination.")
+
+    //   } else {
+
+    //     console.log(genericErrorMessage)
+
+    // }
+    // console.log('error',error);
+    // setIsSubmitting(false)
+
+    // setError(genericErrorMessage)
+
+  // })    
+  // console.log(userContext.token);
+ };
+ const dummy=()=>{
+    setUserContext(oldValues => {
+      return { ...oldValues, token: 1 }
+
+    })
+    navigate('/dashboard');
+
+ }
+ 
+  console.log('token-> ',userContext.token);
 
   const ColorButton = styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(purple[500]),
@@ -66,13 +143,9 @@ function Login() {
     },
   });
 
-  function handleSubmit()
-  {
-    // e.preventDefault();
-    console.log("clicked");
-
-
-  }
+  // useEffect(()=>{
+  //   dummy();
+  // })
 
 
   return (
@@ -104,24 +177,27 @@ function Login() {
         color: loginthememode ? "white" : "black"
       }}>
 
+
         <Box sx={{ display: "flex", flexDirection: "column" }}>
 
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <img src={logo} alt="Peershala" style={{ filter: loginthememode ? 'invert(100%)' : "", fontSize: "1rem", height: "5rem", width: "70%" }} />
           </Box>
-
-
           <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "10rem", color: loginthememode ? "white" : "black" }}>
-            <CssTextField fullWidth label="Email" />
-            <CssTextField fullWidth label="Password" />
-
+            <Input type='email' label="Email" onChange={(e)=>{setmail(e.target.value)}} value={usermail}/>
+            <Input type='text' label="Password" onChange={(e)=>{setpass(e.target.value)}}/>
+            {/* <CssTextField fullWidth type="text" label="Email" value={usermail} defaultValue="hello"  onChange={mailhandler}/> */}
+            {/* <CssTextField fullWidth label="Password" value={userpass}  onChange={(e)=>{
+              setpass(e.target.value);
+            }}/> */}
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column", height: "5rem", width: "100%", justifyContent: "space-between" }}>
-            <ColorButton variant="contained" onClick={handleSubmit()}>Login</ColorButton>
+            <ColorButton variant="contained" onClick={submitHandler}>Login</ColorButton>
             <Link href="#" underline="hover">
               {'Forget Password?"'}
             </Link>
+            <button onClick={dummy}><Link to="/dasboard">dash</Link></button>
             {/* <Box sx={{display:"flex",justifyContent:"space-between"}}>
             </Box> */}
           </Box>
