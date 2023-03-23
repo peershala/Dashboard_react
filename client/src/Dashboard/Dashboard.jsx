@@ -1,6 +1,6 @@
 import { Box, Button } from '@mui/material'
-import React,{useContext} from 'react'
-import { Outlet, Route, Routes } from 'react-router-dom'
+import React,{useContext, useEffect} from 'react'
+import { Outlet, Route, Routes,useNavigate } from 'react-router-dom'
 import { AppState } from '../context/ContextProvider'
 import Achievements from './Achievements/Achievements'
 import Myprofile from './MyProfile/Myprofile'
@@ -14,8 +14,15 @@ import { UserContext } from '../context/ContextProvider'
 function Dashboard() {
     const { thememode } = AppState()
     const [userContext,setContext]=useContext(UserContext);
+    const navigate=useNavigate();
 
-    console.log('token-> ',userContext.token);
+    // console.log('token-> ',userContext.token);
+
+    useEffect(()=>{
+        navigate('/dashboard');
+    },[]);
+    // const id=localStorage.getItem("userstore");
+    // console.log('store id-> ',id);
 
     return (
         <Box component="div" sx={{
@@ -29,7 +36,6 @@ function Dashboard() {
 
             <AppNavbar />
             <Sidebar />
-
             <Box 
             sx={{
                 marginBottom:{ xs: '4rem', sm: '4rem', md: '4rem', lg: '0rem', xl: '0rem' },
@@ -39,6 +45,8 @@ function Dashboard() {
             }}>
                 <Outlet />
             </Box>
+            {/* <Myprofile/> */}
+
             <BottomNav />
         </Box>
     )

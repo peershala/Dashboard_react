@@ -18,6 +18,8 @@ import ThemeToggleButton from './ThemeToggleButton';
 import Axios from 'axios';
 import { UserContext } from '../context/ContextProvider';
 
+Axios.defaults.withCredentials = true;
+
 function Login() {
 
 
@@ -30,6 +32,18 @@ function Login() {
   const genericErrorMessage = "Something went wrong! Please try again later.";
 
 
+  useEffect(() => {
+    // console.log('in useffect');
+    // console.log('local-> ',localStorage.getItem("userstore"));
+    const id=localStorage.getItem("userstore");
+    // console.log('id-> ',id);
+    setUserContext(oldValues=>{
+      return {...oldValues,token:id}
+    })
+    navigate('/');
+  }, [])
+
+
   const toggleTheme = () => {
     loginthememode === false ? setloginThememode(true) : setloginThememode(false)
   }
@@ -37,73 +51,60 @@ function Login() {
   
   const submitHandler=()=>
   {
-    console.log("clicked");
-    console.log(usermail);
-
-    console.log(userpass);
-
-
+    // console.log("clicked");
+    // console.log(usermail);
+    // console.log(userpass);
     // navigate('/dashboard');
 
-    // Axios.post("http://localhost:8880/login",
-    // {username:usermail,
-    // password:userpass
-    // })
-    // .then(async response=>{
-    //   console.log('no error');
-    //   if(response.status==200)
-    //   {
-    //     console.log(response);
-    //     // console.log(response.data.user_id);
-    //     setUserContext(oldValues => {
-    //       return { ...oldValues, token: response.data }
+    Axios.post("http://localhost:8880/login",
+    {username:usermail,
+    password:userpass
+    })
+    .then(async response=>{
+      // console.log('no error');
+      if(response.status==200)
+      {
+        // console.log(response.data);
+        // console.log(response.data.user_id);
+        setUserContext(oldValues => {
+          return { ...oldValues, token: response.data }
 
-    //     })
+        })
 
-    //     try {
-    //       localStorage.setItem("userstore", JSON.stringify(response.data));
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
+        try {
+          localStorage.setItem("userstore", JSON.stringify(response.data));
+        } catch (error) {
+          console.log(error);
+        }
+        navigate('/dashboard');
+      }
+    })
+    .catch(error => {
 
-    //   }
-      
-    // })
-    // .catch(error => {
+      if(error.response)
+      if (error.response.status === 400) {
 
-    //   if(error.response)
-    //   if (error.response.status === 400) {
+        // setError("Please fill all the fields correctly!")
+        console.log("Please fill all the fields correctly!")
 
-    //     // setError("Please fill all the fields correctly!")
-    //     console.log("Please fill all the fields correctly!")
+      } else if (error.response.status === 401) {
 
-    //   } else if (error.response.status === 401) {
+        console.log("Invalid email and password combination.")
 
-    //     console.log("Invalid email and password combination.")
+      } else {
 
-    //   } else {
+        console.log(genericErrorMessage)
 
-    //     console.log(genericErrorMessage)
-
-    // }
-    // console.log('error',error);
+    }
+    console.log('error',error);
     // setIsSubmitting(false)
 
     // setError(genericErrorMessage)
 
-  // })    
-  // console.log(userContext.token);
- };
- const dummy=()=>{
-    setUserContext(oldValues => {
-      return { ...oldValues, token: 1 }
+  })    
+  };
 
-    })
-    navigate('/dashboard');
 
- }
- 
-  console.log('token-> ',userContext.token);
 
   const ColorButton = styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(purple[500]),
@@ -143,10 +144,6 @@ function Login() {
     },
   });
 
-  // useEffect(()=>{
-  //   dummy();
-  // })
-
 
   return (
     <Box sx={{
@@ -184,8 +181,8 @@ function Login() {
             <img src={logo} alt="Peershala" style={{ filter: loginthememode ? 'invert(100%)' : "", fontSize: "1rem", height: "5rem", width: "70%" }} />
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "10rem", color: loginthememode ? "white" : "black" }}>
-            <Input type='email' label="Email" onChange={(e)=>{setmail(e.target.value)}} value={usermail}/>
-            <Input type='text' label="Password" onChange={(e)=>{setpass(e.target.value)}}/>
+            <Input type='email' label="Email" onChange={(e)=>{setmail(e.target.value)}} value={usermail} required/>
+            <Input type='password' label="Password" onChange={(e)=>{setpass(e.target.value)}} required/>
             {/* <CssTextField fullWidth type="text" label="Email" value={usermail} defaultValue="hello"  onChange={mailhandler}/> */}
             {/* <CssTextField fullWidth label="Password" value={userpass}  onChange={(e)=>{
               setpass(e.target.value);
@@ -197,7 +194,6 @@ function Login() {
             <Link href="#" underline="hover">
               {'Forget Password?"'}
             </Link>
-            <button onClick={dummy}><Link to="/dasboard">dash</Link></button>
             {/* <Box sx={{display:"flex",justifyContent:"space-between"}}>
             </Box> */}
           </Box>

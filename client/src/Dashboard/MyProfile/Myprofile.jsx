@@ -1,14 +1,19 @@
 import { Box, Paper, Typography } from '@mui/material'
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import React ,{useEffect} from 'react'
+import { Outlet ,useNavigate} from 'react-router-dom'
 import banner from '../../assets/banner.png';
 import { AppState } from '../../context/ContextProvider';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MaxScreen from './MaxScreen';
 import MinScreen from './MinScreen';
 
+
 function Myprofile() {
   const { thememode } = AppState()
+  const navigate=useNavigate();
+//   useEffect(()=>{
+//     navigate('/dashboard');
+// });
   return (
     <Box sx={{ overflow: "scroll", borderRadius: "15px", padding: "1rem" }}>
       <>

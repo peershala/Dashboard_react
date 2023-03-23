@@ -7,20 +7,33 @@ const path = require('path');
 const cors=require('cors')
 const filestore = require("session-file-store")(session)
 require('dotenv').config();
+const bodyParser = require("body-parser");
 
-app.use(cors());
+
+app.use(cors({
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true,
+}));
 app.use(express.urlencoded({extended:true}))
 app.use(session({
     secret:'asecret',
     saveUninitialized: true,
     resave: false,
-    store: new filestore()
+    store: new filestore(),
+    cookie : {
+        secure:'auto',
+        sameSite: 'strict', // THIS is the config you are looing for.
+    }
 }));
 
-app.use((req,res,next)=>{
-    console.log(req.body,"session-> ",req.session);
-    next();
-})
+app.use(bodyParser.json())
+
+
+// app.use((req,res,next)=>{
+//     console.log(req.body,"session-> ",req.session);
+//     next();
+// })
 
 const db = mysql.createConnection({
     // host:process.env.HOST,
@@ -28,7 +41,7 @@ const db = mysql.createConnection({
     // user:process.env.MYSQL_USER,
     user:'root',
     // password:process.env.PASSWORD,
-    password:'rootpass',
+    password:'',
     // database:process.env.DATABASE
     database:'toptrove'
 })//fill it up
@@ -88,7 +101,8 @@ app.post('/register',async(req,res)=>{
 
 
 app.post('/login',async(req,res)=>{
-    const {username,password}=req.body;
+    const {username,password}=req.body||"nulluser";
+    // console.log('username-> ',username);
 
     const query2="SELECT id,user_password from auth where user_name=?"//change the table name,column name as per requirement
 
@@ -96,13 +110,15 @@ app.post('/login',async(req,res)=>{
         if(err)
         {
             console.log(err);
-            res.sendStatus(404);
+            res.statusCode = 400;
+            res.send("Invalid Details");
         }
 
         if(result.length==0)
         {
-            console.log('WRONG USERNAME OR PASSWORD');
-            res.redirect(403);
+            console.log('first WRONG USERNAME OR PASSWORD');
+            res.statusCode = 401;
+            res.send("Unauthorized");
         }
         else{
             var userId=result[0].id || 0;
@@ -112,11 +128,13 @@ app.post('/login',async(req,res)=>{
                 {
                     req.session.user_id=userId;
                     console.log("valid",req.session);
-                    res.sendStatus(200);
+                    // res.statusCode=200;
+                    // res.send({success:true,userId});
+                    res.send(req.session);
                 }
                 else{
-                    console.log('WRONG USERNAME OR PASSWORD');
-                    res.sendStatus(403);
+                    res.statusCode=400;
+                    res.send({success:false});
                 }
             }
         }
@@ -124,7 +142,8 @@ app.post('/login',async(req,res)=>{
 });
 
 app.post('/logout',(req,res)=>{
-    req.session.user_id=null;
+    // req.session.user_id=null;
+    req.session.destroy();
     console.log('LOGGED OUT SUCCESSFULLY');
     res.sendStatus(200);
 })

@@ -1,12 +1,21 @@
 import { Box, Button, styled, Typography } from "@mui/material";
 import { Container } from "@mui/system";
-import React from "react";
+import React , {useEffect} from "react";
 import CustomButton from "./CustomButton";
 import Process from "./Process";
 import Details from "./Details";
 import coee from "../../assets/coee.png";
+import { useNavigate } from "react-router-dom";
 
 const Myteam = () => {
+
+  const navigate =useNavigate();
+
+  useEffect(()=>{
+    navigate('/dashboard/myteam');
+},[]);
+
+
   const CustomBox = styled(Box)(({ theme }) => ({
     display: "flex",
     justifyContent: "center",
