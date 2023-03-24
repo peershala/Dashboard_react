@@ -1,12 +1,18 @@
 import { Box, Paper, Typography } from '@mui/material'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import React from 'react'
+import React ,{useEffect} from 'react'
 import { AppState } from '../../context/ContextProvider';
 import Cards from './Cards';
+import { useNavigate } from 'react-router-dom';
 
 function Achievements() {
 
-  const { thememode } = AppState()
+  const navigate =useNavigate();
+  const { thememode } = AppState();
+
+  useEffect(()=>{
+    navigate('/dashboard/achieve');
+},[]);
 
   return (
     <div style={{ overflow: "scroll", background: "", height: "100%", borderRadius: "10px" }}>
