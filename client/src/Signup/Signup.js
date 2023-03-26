@@ -40,7 +40,7 @@ function Login() {
     // console.log(userpass);
     // navigate('/dashboard');
 
-    Axios.post("http://localhost:8880/register",
+    Axios.post("/register",
     {username:usermail,
     password:userpass
     })
