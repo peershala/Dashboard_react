@@ -7,8 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "cd client && npm i && npm start",
     "server": "cd server && node index.js",
-    "fullappstart": "concurrently \"npm run server\" \"npm run client\""
+    "fullappstart": "concurrently \"npm run server\""
   },
+  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/realvineeths/toptrove-dashboard.git"

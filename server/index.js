@@ -10,6 +10,9 @@ require('dotenv').config();
 const bodyParser = require("body-parser");
 
 
+
+app.use(express.static(path.join(__dirname, 'build')));
+
 app.use(cors({
     origin: ["http://localhost:3000"],
     methods: ["GET", "POST"],
@@ -51,12 +54,12 @@ console.log('Connected to the MySQL server.');
 
 
 //home page routes
-// app.get("/",(req,res)=>
-// {
+app.get("/*",(req,res)=>
+{
 
-//   res.sendFile('register.html',{root:__dirname+'/client/pages'});
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 
-// });
+});
 
 
 app.post('/register',async(req,res)=>{
@@ -144,21 +147,21 @@ app.post('/logout',(req,res)=>{
     res.sendStatus(200);
 })
 
-app.get('/dashboard',(req,res)=>{
-    console.log('asking permision..');
-    if(!req.session.user_id){
-        console.log('NOT LOGGED IN');
-        res.sendStatus(401);
-    }
-    else{
-        res.sendStatus(200);
-    }
-})
+// app.get('/dashboard',(req,res)=>{
+//     console.log('asking permision..');
+//     if(!req.session.user_id){
+//         console.log('NOT LOGGED IN');
+//         res.sendStatus(401);
+//     }
+//     else{
+//         res.sendStatus(200);
+//     }
+// })
 
 
-app.get('*',(req,res)=>{
-    res.sendStatus(404);
-})
+// app.get('*',(req,res)=>{
+//     res.sendStatus(404);
+// })
 
 
 
