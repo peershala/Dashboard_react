@@ -37,13 +37,9 @@ app.use(bodyParser.json())
 
 const db = mysql.createConnection({
     // host:process.env.HOST,
-    host:'localhost',
     // user:process.env.MYSQL_USER,
-    user:'root',
     // password:process.env.PASSWORD,
-    password:'',
     // database:process.env.DATABASE
-    database:'toptrove'
 })//fill it up
 
 db.connect(function(err) {
