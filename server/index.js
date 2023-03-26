@@ -33,16 +33,20 @@ app.use(session({
 app.use(bodyParser.json())
 
 
-// app.use((req,res,next)=>{
-//     console.log(req.body,"session-> ",req.session);
-//     next();
-// })
+app.use((req,res,next)=>{
+    console.log(req.body,"session-> ",req.session);
+    next();
+})
 
 const db = mysql.createConnection({
-    host:process.env.HOST,
-    user:process.env.MYSQL_USER,
-    password:process.env.PASSWORD,
-    database:process.env.DATABASE
+    host:"database-1.cz4k2aulzdrl.ap-south-1.rds.amazonaws.com",
+    // host:process.env.HOST,
+    // user:process.env.MYSQL_USER,
+    user:"admin",
+    // password:process.env.PASSWORD,
+    password:"awspass123",
+    database:"toptrove"
+    // database:process.env.DATABASE
 })//fill it up
 
 db.connect(function(err) {
@@ -103,6 +107,11 @@ app.post('/login',async(req,res)=>{
     const {username,password}=req.body||"nulluser";
     // console.log('username-> ',username);
 
+    if(username=='' || password=='')
+    {
+        res.statusCode = 400;
+        res.send("Invalid Details");
+    }
     const query2="SELECT id,user_password from auth where user_name=?"//change the table name,column name as per requirement
 
     db.query(query2,username,async (err,result)=>{
