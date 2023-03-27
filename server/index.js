@@ -10,6 +10,9 @@ require('dotenv').config();
 const bodyParser = require("body-parser");
 
 
+
+app.use(express.static(path.join(__dirname, 'build')));
+
 app.use(cors({
     origin: ["http://localhost:3000"],
     methods: ["GET", "POST"],
@@ -30,20 +33,20 @@ app.use(session({
 app.use(bodyParser.json())
 
 
-// app.use((req,res,next)=>{
-//     console.log(req.body,"session-> ",req.session);
-//     next();
-// })
+app.use((req,res,next)=>{
+    console.log(req.body,"session-> ",req.session);
+    next();
+})
 
 const db = mysql.createConnection({
+    host:"database-1.cz4k2aulzdrl.ap-south-1.rds.amazonaws.com",
     // host:process.env.HOST,
-    host:'localhost',
     // user:process.env.MYSQL_USER,
-    user:'root',
+    user:"admin",
     // password:process.env.PASSWORD,
-    password:'',
+    password:"awspass123",
+    database:"toptrove"
     // database:process.env.DATABASE
-    database:'toptrove'
 })//fill it up
 
 db.connect(function(err) {
@@ -55,12 +58,12 @@ console.log('Connected to the MySQL server.');
 
 
 //home page routes
-// app.get("/",(req,res)=>
-// {
+app.get("/*",(req,res)=>
+{
 
-//   res.sendFile('register.html',{root:__dirname+'/client/pages'});
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 
-// });
+});
 
 
 app.post('/register',async(req,res)=>{
@@ -104,6 +107,11 @@ app.post('/login',async(req,res)=>{
     const {username,password}=req.body||"nulluser";
     // console.log('username-> ',username);
 
+    if(username=='' || password=='')
+    {
+        res.statusCode = 400;
+        res.send("Invalid Details");
+    }
     const query2="SELECT id,user_password from auth where user_name=?"//change the table name,column name as per requirement
 
     db.query(query2,username,async (err,result)=>{
@@ -148,21 +156,21 @@ app.post('/logout',(req,res)=>{
     res.sendStatus(200);
 })
 
-app.get('/dashboard',(req,res)=>{
-    console.log('asking permision..');
-    if(!req.session.user_id){
-        console.log('NOT LOGGED IN');
-        res.sendStatus(401);
-    }
-    else{
-        res.sendStatus(200);
-    }
-})
+// app.get('/dashboard',(req,res)=>{
+//     console.log('asking permision..');
+//     if(!req.session.user_id){
+//         console.log('NOT LOGGED IN');
+//         res.sendStatus(401);
+//     }
+//     else{
+//         res.sendStatus(200);
+//     }
+// })
 
 
-app.get('*',(req,res)=>{
-    res.sendStatus(404);
-})
+// app.get('*',(req,res)=>{
+//     res.sendStatus(404);
+// })
 
 
 

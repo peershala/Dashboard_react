@@ -4,9 +4,12 @@
   "description": "npm init -y<br>\r npm i<br>\r npm i bcrypt express cors dotenv express-session mysql2 path",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && npm i && npm start",
+    "server": "cd server && node index.js",
+    "fullappstart": "concurrently \"npm run server\""
   },
+  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/realvineeths/toptrove-dashboard.git"
@@ -25,6 +28,7 @@
     "body-parser": "^1.20.2",
     "bootstrap": "^5.2.3",
     "chart.js": "^4.2.0",
+    "concurrently": "^7.6.0",
     "cors": "^2.8.5",
     "datatables.net-bs4": "^1.13.1",
     "dotenv": "^16.0.3",

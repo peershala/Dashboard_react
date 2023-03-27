@@ -56,7 +56,7 @@ function Login() {
     // console.log(userpass);
     // navigate('/dashboard');
 
-    Axios.post("http://localhost:8880/login",
+    Axios.post("/login",
     {username:usermail,
     password:userpass
     })

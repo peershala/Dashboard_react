@@ -37,7 +37,7 @@ export default function Alert() {
         });
         // console.log('in logout');
 
-        Axios.post("http://localhost:8880/logout")
+        Axios.post("/logout")
         .then(res=>{
             // console.log(res);
         })
