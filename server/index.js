@@ -8,10 +8,17 @@ const cors=require('cors')
 const filestore = require("session-file-store")(session)
 require('dotenv').config();
 const bodyParser = require("body-parser");
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const ejs= require('ejs');
 
 
+app.use(express.static(path.join(__dirname,'/../client/build/')));
 
-app.use(express.static(path.join(__dirname, 'build')));
+app.use((req,res,next)=>{
+    console.log(path.join(__dirname,'/../client/build'));
+    next();
+});
 
 app.use(cors({
     origin: ["http://localhost:3000"],
@@ -39,12 +46,14 @@ app.use((req,res,next)=>{
 })
 
 const db = mysql.createConnection({
-    host:"database-1.cz4k2aulzdrl.ap-south-1.rds.amazonaws.com",
+    // host:"database-1.cz4k2aulzdrl.ap-south-1.rds.amazonaws.com",
     // host:process.env.HOST,
+    host:"localhost",
     // user:process.env.MYSQL_USER,
-    user:"admin",
+    // user:"admin",
+    user:"root",
     // password:process.env.PASSWORD,
-    password:"awspass123",
+    password:"rootpass",
     database:"toptrove"
     // database:process.env.DATABASE
 })//fill it up
@@ -61,7 +70,7 @@ console.log('Connected to the MySQL server.');
 app.get("/*",(req,res)=>
 {
 
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
 
 });
 
@@ -135,6 +144,8 @@ app.post('/login',async(req,res)=>{
                 if(validuser)
                 {
                     req.session.user_id=userId;
+                    req.session.username=username;
+
                     console.log("valid",req.session);
                     // res.statusCode=200;
                     // res.send({success:true,userId});
@@ -156,22 +167,77 @@ app.post('/logout',(req,res)=>{
     res.sendStatus(200);
 })
 
-// app.get('/dashboard',(req,res)=>{
-//     console.log('asking permision..');
-//     if(!req.session.user_id){
-//         console.log('NOT LOGGED IN');
-//         res.sendStatus(401);
-//     }
-//     else{
-//         res.sendStatus(200);
-//     }
-// })
+app.post('/filestore',async (req,res)=>{
+    const{cname,ctitle,cscore,cdate,uname}=req.body;//name of candidate,job title,score of candidate and date of issue of certificate is taken from request body.
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    try {
+      var compiled = ejs.compile(fs.readFileSync(__dirname + '/views/cert1.ejs', 'utf8'));
+      var html = compiled({ name: cname, title:ctitle , score:cscore,date:cdate});//DYNAMIC VALUES
+      await page.setContent(html, { waitUntil: 'domcontentloaded' });
+    } catch (error) {
+      console.log(new Error(`${error}`));
+      await browser.close();
+      res.send(error);
+      return;
+    }
+
+    await page.emulateMediaType('screen');
+
+    const pdf = await page.pdf({
+      // path: `${cname}.pdf`,
+      margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+      printBackground: true,
+      format: 'letter',
+    });
+    //once the pdf is created it is not stored in any path, instead its stored in database in next step.
+    await browser.close();
+    const values=[cname,pdf,uname];
+    const query= "INSERT INTO certificate(`file_name`,`file_data`,`username`) values (?,?,?)";
+    db.query(query,values,(err,result)=>{
+      if(err)
+      {
+        console.log(err);
+        res.send(err)
+        return;
+      }
+      console.log(result);
+    });
+    res.send('ok');
+});
 
 
-// app.get('*',(req,res)=>{
-//     res.sendStatus(404);
-// })
+ app.post("/fileget", (req, res) => {
+    // const  file_name =req.body.file_name|| "nulluser";
+    const  file_user =req.body.file_name|| "nulluser";
+    console.log(file_user);
+  
+    const query = "Select file_data From certificate Where username = ?";
+    db.query(query, [file_user],(err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      try {
+        fs.writeFileSync(path.join(__dirname, `../client/build/${file_user}.pdf`), Buffer.from(result[0].file_data));
+        res.send('ok');
+      } catch (error) {
+        console.log(error);
+        res.send('error in accessing file from daatabse');
+      }
+    })
+  });
 
+
+  app.post('/clearfile',(req,res)=>{
+
+    const file_user =req.body.file_name || "nullfile";
+    console.log('clear file ',file_user);
+    // fs.unlink(path.join(__dirname, `../client/build/${file_user}.pdf`), (err)=>{
+    //   if(err) console.log(err);;
+    // })
+    res.send('File deleted');
+  
+  });
 
 
 const port=process.env.PORT || 8880;

@@ -36,25 +36,21 @@ function Login() {
     // console.log('in useffect');
     // console.log('local-> ',localStorage.getItem("userstore"));
     const id=localStorage.getItem("userstore");
+    // console.log(id.username);
     // console.log('id-> ',id);
     setUserContext(oldValues=>{
       return {...oldValues,token:id}
     })
     navigate('/');
-  }, [])
+  }, []);
 
 
   const toggleTheme = () => {
     loginthememode === false ? setloginThememode(true) : setloginThememode(false)
   }
 
-  
   const submitHandler=()=>
   {
-    // console.log("clicked");
-    // console.log(usermail);
-    // console.log(userpass);
-    // navigate('/dashboard');
 
     Axios.post("/login",
     {username:usermail,
