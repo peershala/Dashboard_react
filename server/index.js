@@ -20,14 +20,11 @@ app.use((req,res,next)=>{
     next();
 });
 
-// app.use(cors({
-//     origin: ["http://localhost:3000"],
-//     methods: ["GET", "POST"],
-//     credentials: true,
-// }));
+
 app.use(express.urlencoded({extended:false}))
 app.use(session({
-    secret:'asecret',
+    secret:process.env.SECRET,
+    // secret:"",
     saveUninitialized: true,
     resave: false,
     store: new filestore(),
@@ -46,16 +43,14 @@ app.use((req,res,next)=>{
 })
 
 const db = mysql.createConnection({
-    // host:"database-1.cz4k2aulzdrl.ap-south-1.rds.amazonaws.com",
-    // host:process.env.HOST,
-    host:"localhost",
-    // user:process.env.MYSQL_USER,
-    // user:"admin",
-    user:"root",
-    // password:process.env.PASSWORD,
-    password:"rootpass",
-    database:"toptrove"
-    // database:process.env.DATABASE
+    host:process.env.HOST,
+    // host:"localhost",
+    user:process.env.MYSQL_USER,
+    // user:"root",
+    password:process.env.PASSWORD,
+    // password:"",
+    // database:""
+    database:process.env.DATABASE
 })//fill it up
 
 db.connect(function(err) {
@@ -114,7 +109,6 @@ app.post('/register',async(req,res)=>{
 
 app.post('/login',async(req,res)=>{
     const {username,password}=req.body||"nulluser";
-    // console.log('username-> ',username);
 
     if(username=='' || password=='')
     {
@@ -147,8 +141,6 @@ app.post('/login',async(req,res)=>{
                     req.session.username=username;
 
                     console.log("valid",req.session);
-                    // res.statusCode=200;
-                    // res.send({success:true,userId});
                     res.send(req.session);
                 }
                 else{
@@ -161,7 +153,6 @@ app.post('/login',async(req,res)=>{
 });
 
 app.post('/logout',(req,res)=>{
-    // req.session.user_id=null;
     req.session.destroy();
     console.log('LOGGED OUT SUCCESSFULLY');
     res.sendStatus(200);
@@ -185,7 +176,6 @@ app.post('/filestore',async (req,res)=>{
     await page.emulateMediaType('screen');
 
     const pdf = await page.pdf({
-      // path: `${cname}.pdf`,
       margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
       printBackground: true,
       format: 'letter',
@@ -207,26 +197,6 @@ app.post('/filestore',async (req,res)=>{
 });
 
 
-//  app.post("/fileget", (req, res) => {
-//     // const  file_name =req.body.file_name|| "nulluser";
-//     const  file_user =req.body.file_name|| "nulluser";
-//     console.log(file_user);
-  
-//     const query = "Select file_data From certificate Where username = ?";
-//     db.query(query, [file_user],(err, result) => {
-//       if (err) {
-//         console.log(err);
-//       }
-//       try {
-//         fs.writeFileSync(path.join(__dirname, `/../client/build/${file_user}.pdf`), Buffer.from(result[0].file_data));
-//       } catch (error) {
-//         console.log(error);
-//         // res.send('error in accessing file from daatabse');
-//       }
-//     res.send('ok');
-
-//     })
-//   });
 
 app.post("/fileget", (req, res) => {
     const  file_user =req.body.file_name|| "nulluser";
@@ -250,20 +220,10 @@ app.post("/fileget", (req, res) => {
 });
 
 
-  app.post('/clearfile',(req,res)=>{
-
-    const file_user =req.body.file_name || "nullfile";
-    console.log('clear file ',file_user);
-    // fs.unlink(path.join(__dirname, `../client/build/${file_user}.pdf`), (err)=>{
-    //   if(err) console.log(err);;
-    // })
-    res.send('File deleted');
-  
-  });
 
 
 const port=process.env.PORT || 8880;
 
 app.listen(port,()=>{
     console.log(`SESSION HEARING on ${port}..`);
-})
+});
