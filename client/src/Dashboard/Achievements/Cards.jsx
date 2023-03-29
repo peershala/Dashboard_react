@@ -11,26 +11,23 @@ function Cards() {
 
     const downloadHandler=()=>
     {
+
         const id=localStorage.getItem("userstore");
         const uid=JSON.parse(id);
-        // const uname1=uid.username;
-        const uname1="vini4@gmail.com";
-        console.log(uname1);
-        Axios.post('/fileget',{file_name:uname1}).then(res=>{
-            fetch(`${uname1}.pdf`).then(response => {
-              response.blob().then(blob => {
-                  // Creating new object of PDF file
-                  const fileURL = window.URL.createObjectURL(blob);
-                  // Setting various property values
-                  let alink = document.createElement('a');
-                  alink.href = fileURL;
-                  alink.download = `${uname1}.pdf`;
-                  alink.click();
-              })
-            Axios.post('/clearfile',{file_name:uname1}).then(res=>{console.log(res);}).catch((err)=>{console.log(err);});
-          }).catch(err=>{console.log(err);});
-            console.log(res);
-          }).catch((err)=>{console.log(err);});
+        const uname1=uid.username || "nulluser";
+
+
+        Axios.post('/fileget', { file_name: uname1 }, { responseType: 'blob' })
+        .then(res => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `${uname1}.pdf`);
+          document.body.appendChild(link);
+          link.click();
+          link.parentNode.removeChild(link);
+        })
+        .catch(err => console.log(err));
 
     }
 

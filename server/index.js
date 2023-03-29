@@ -13,19 +13,19 @@ const fs = require('fs');
 const ejs= require('ejs');
 
 
-app.use(express.static(path.join(__dirname,'/../client/build/')));
+app.use(express.static(path.join(__dirname,'/../client/build')));
 
 app.use((req,res,next)=>{
     console.log(path.join(__dirname,'/../client/build'));
     next();
 });
 
-app.use(cors({
-    origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
-    credentials: true,
-}));
-app.use(express.urlencoded({extended:true}))
+// app.use(cors({
+//     origin: ["http://localhost:3000"],
+//     methods: ["GET", "POST"],
+//     credentials: true,
+// }));
+app.use(express.urlencoded({extended:false}))
 app.use(session({
     secret:'asecret',
     saveUninitialized: true,
@@ -207,25 +207,47 @@ app.post('/filestore',async (req,res)=>{
 });
 
 
- app.post("/fileget", (req, res) => {
-    // const  file_name =req.body.file_name|| "nulluser";
-    const  file_user =req.body.file_name|| "nulluser";
-    console.log(file_user);
+//  app.post("/fileget", (req, res) => {
+//     // const  file_name =req.body.file_name|| "nulluser";
+//     const  file_user =req.body.file_name|| "nulluser";
+//     console.log(file_user);
   
+//     const query = "Select file_data From certificate Where username = ?";
+//     db.query(query, [file_user],(err, result) => {
+//       if (err) {
+//         console.log(err);
+//       }
+//       try {
+//         fs.writeFileSync(path.join(__dirname, `/../client/build/${file_user}.pdf`), Buffer.from(result[0].file_data));
+//       } catch (error) {
+//         console.log(error);
+//         // res.send('error in accessing file from daatabse');
+//       }
+//     res.send('ok');
+
+//     })
+//   });
+
+app.post("/fileget", (req, res) => {
+    const  file_user =req.body.file_name|| "nulluser";
+    console.log('in file get',file_user);
+
     const query = "Select file_data From certificate Where username = ?";
     db.query(query, [file_user],(err, result) => {
       if (err) {
-        console.log(err);
+        res.status(500).send("Error retrieving file data");
       }
-      try {
-        fs.writeFileSync(path.join(__dirname, `../client/build/${file_user}.pdf`), Buffer.from(result[0].file_data));
-        res.send('ok');
-      } catch (error) {
-        console.log(error);
-        res.send('error in accessing file from daatabse');
+      else if(result.length==0)
+      {
+        res.status(400).send('File not found');
+      }
+      else{
+        const fileData = result[0].file_data;
+        res.setHeader("Content-Type", "application/pdf");
+        res.send(Buffer.from(fileData, "binary"));
       }
     })
-  });
+});
 
 
   app.post('/clearfile',(req,res)=>{
