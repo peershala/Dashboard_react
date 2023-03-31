@@ -49,7 +49,7 @@ const db = mysql.createConnection({
     // user:process.env.MYSQL_USER,
     user:"root",
     // password:process.env.PASSWORD,
-    password:"rootpass",
+    password:"",
     database:"toptrove"
     // database:process.env.DATABASE
 })//fill it up
