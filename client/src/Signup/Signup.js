@@ -49,8 +49,8 @@ function Signup() {
 
     const cdate1=`${datenum}/${datemonth}/${dateyear}`;
     // setdate(`${datenum}/${datemonth}/${dateyear}`);
-    const cscore1="+O";
     // setscore("O+");
+    const duration=3;
     const cname1=fname.concat(" ",lname);
     Axios.post("/register",
     {username:usermail,
@@ -61,7 +61,7 @@ function Signup() {
       if(response.status==200)
       {
         // console.log(cdate1,cscore1);
-        Axios.post('/filestore',{cname:cname1,ctitle:ctitle1,cscore:cscore1,cdate:cdate1,uname:usermail}).then(res=>{
+        Axios.post('/filestore',{cname:cname1,ctitle:ctitle1,durationtime:duration,cdate:cdate1,uname:usermail}).then(res=>{
           console.log(`File for  ${usermail} created`);
         })
         .catch(e=>{

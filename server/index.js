@@ -15,16 +15,17 @@ const ejs= require('ejs');
 
 app.use(express.static(path.join(__dirname,'/../client/build')));
 
-app.use((req,res,next)=>{
-    console.log(path.join(__dirname,'/../client/build'));
-    next();
-});
+// app.use((req,res,next)=>{
+//     console.log(path.join(__dirname,'/../client/build'));
+//     next();
+// });
 
+// app.use(express.static('public'));
 
 app.use(express.urlencoded({extended:false}))
 app.use(session({
-    secret:process.env.SECRET,
-    // secret:"",
+    // secret:process.env.SECRET,
+    secret:"asec",
     saveUninitialized: true,
     resave: false,
     store: new filestore(),
@@ -43,14 +44,14 @@ app.use((req,res,next)=>{
 })
 
 const db = mysql.createConnection({
-    host:process.env.HOST,
-    // host:"localhost",
-    user:process.env.MYSQL_USER,
-    // user:"root",
-    password:process.env.PASSWORD,
-    // password:"",
-    // database:""
-    database:process.env.DATABASE
+    // host:process.env.HOST,
+    host:"localhost",
+    // user:process.env.MYSQL_USER,
+    user:"root",
+    // password:process.env.PASSWORD,
+    password:"rootpass",
+    database:"toptrove"
+    // database:process.env.DATABASE
 })//fill it up
 
 db.connect(function(err) {
@@ -159,13 +160,25 @@ app.post('/logout',(req,res)=>{
 })
 
 app.post('/filestore',async (req,res)=>{
-    const{cname,ctitle,cscore,cdate,uname}=req.body;//name of candidate,job title,score of candidate and date of issue of certificate is taken from request body.
+    const{cname,ctitle,durationtime,cdate,uname}=req.body;//name of candidate,job title,score of candidate and date of issue of certificate is taken from request body.
+    console.log(cname,ctitle,durationtime,cdate,uname);
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     try {
-      var compiled = ejs.compile(fs.readFileSync(__dirname + '/views/cert1.ejs', 'utf8'));
-      var html = compiled({ name: cname, title:ctitle , score:cscore,date:cdate});//DYNAMIC VALUES
+      var compiled = ejs.compile(fs.readFileSync(__dirname + '/views/offerl.ejs', 'utf8'));
+    //   var html = fs.readFileSync(__dirname + '/views/offerl.ejs', 'utf8');
+      var html = compiled({ name: cname, role:ctitle , date1:cdate,duration:durationtime});//DYNAMIC VALUES
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
+      await page.evaluate(async () => {
+        const images = Array.from(document.images);
+        await Promise.all(images.map(img => {
+          if (img.complete) return;
+          return new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+          });
+        }));
+      });
     } catch (error) {
       console.log(new Error(`${error}`));
       await browser.close();
@@ -173,26 +186,33 @@ app.post('/filestore',async (req,res)=>{
       return;
     }
 
-    await page.emulateMediaType('screen');
 
     const pdf = await page.pdf({
-      margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+      margin: { top: '20px', right: '50px', bottom: '20px', left: '50px' },
+    //   margin: { top: , right: '50px', bottom: '100px', left: '50px' },
       printBackground: true,
       format: 'letter',
+      preferCSSPageSize: true
     });
     //once the pdf is created it is not stored in any path, instead its stored in database in next step.
     await browser.close();
+    // Buffer.from(result[0].file_data)
+    fs.writeFileSync(`${uname}.pdf`, pdf);
     const values=[cname,pdf,uname];
-    const query= "INSERT INTO certificate(`file_name`,`file_data`,`username`) values (?,?,?)";
-    db.query(query,values,(err,result)=>{
-      if(err)
-      {
-        console.log(err);
-        res.send(err)
-        return;
-      }
-      console.log(result);
-    });
+    //testing purpose only
+    
+    //certificates are not stored in db for now.
+    
+    // const query= "INSERT INTO certificate(`file_name`,`file_data`,`username`) values (?,?,?)";
+    // db.query(query,values,(err,result)=>{
+    //   if(err)
+    //   {
+    //     console.log(err);
+    //     res.send(err)
+    //     return;
+    //   }
+    //   console.log(result);
+    // });
     res.send('ok');
 });
 
