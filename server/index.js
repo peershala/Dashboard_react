@@ -15,17 +15,12 @@ const ejs= require('ejs');
 
 app.use(express.static(path.join(__dirname,'/../client/build')));
 
-// app.use((req,res,next)=>{
-//     console.log(path.join(__dirname,'/../client/build'));
-//     next();
-// });
 
-// app.use(express.static('public'));
 
 app.use(express.urlencoded({extended:false}))
 app.use(session({
-    // secret:process.env.SECRET,
-    secret:"asec",
+    secret:process.env.SECRET,
+    // secret:"asec",
     saveUninitialized: true,
     resave: false,
     store: new filestore(),
@@ -44,14 +39,14 @@ app.use((req,res,next)=>{
 })
 
 const db = mysql.createConnection({
-    // host:process.env.HOST,
-    host:"localhost",
-    // user:process.env.MYSQL_USER,
-    user:"root",
-    // password:process.env.PASSWORD,
-    password:"",
-    database:"toptrove"
-    // database:process.env.DATABASE
+    host:process.env.HOST,
+    // host:"localhost",
+    user:process.env.MYSQL_USER,
+    // user:"root",
+    password:process.env.PASSWORD,
+    // password:"rootpass",
+    // database:"toptrove"
+    database:process.env.DATABASE
 })//fill it up
 
 db.connect(function(err) {
@@ -169,23 +164,29 @@ app.post('/filestore',async (req,res)=>{
     //   var html = fs.readFileSync(__dirname + '/views/offerl.ejs', 'utf8');
       var html = compiled({ name: cname, role:ctitle , date1:cdate,duration:durationtime});//DYNAMIC VALUES
       await page.setContent(html, { waitUntil: 'domcontentloaded' });
-      await page.evaluate(async () => {
-        const images = Array.from(document.images);
-        await Promise.all(images.map(img => {
-          if (img.complete) return;
-          return new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-          });
-        }));
-      });
+      // await page.evaluate(async () => {
+      //   try {
+      //     const images = Array.from(document.images);
+      //     await Promise.all(images.map(img => {
+      //       if (img.complete) return;
+      //       return new Promise((resolve, reject) => {
+      //         img.onload = resolve;
+      //         img.onerror = reject;
+      //       });
+      //     }));          
+      //   } catch (error) {
+      //     console.log('error in eval',error);
+      //   }
+
+      // });
+      await page.waitForTimeout(4000);
     } catch (error) {
-      console.log(new Error(`${error}`));
+      // console.log(new Error(`${error}`));
+      console.log(error);
       await browser.close();
       res.send(error);
       return;
     }
-
 
     const pdf = await page.pdf({
       margin: { top: '20px', right: '50px', bottom: '20px', left: '50px' },
@@ -197,22 +198,22 @@ app.post('/filestore',async (req,res)=>{
     //once the pdf is created it is not stored in any path, instead its stored in database in next step.
     await browser.close();
     // Buffer.from(result[0].file_data)
-    fs.writeFileSync(`${uname}.pdf`, pdf);
+    // fs.writeFileSync(`${uname}.pdf`, pdf);
     const values=[cname,pdf,uname];
     //testing purpose only
-    
+
     //certificates are not stored in db for now.
-    
-    // const query= "INSERT INTO certificate(`file_name`,`file_data`,`username`) values (?,?,?)";
-    // db.query(query,values,(err,result)=>{
-    //   if(err)
-    //   {
-    //     console.log(err);
-    //     res.send(err)
-    //     return;
-    //   }
-    //   console.log(result);
-    // });
+
+    const query= "INSERT INTO certificate(`file_name`,`file_data`,`username`) values (?,?,?)";
+    db.query(query,values,(err,result)=>{
+      if(err)
+      {
+        console.log(err);
+        res.send(err)
+        return;
+      }
+      console.log(result);
+    });
     res.send('ok');
 });
 

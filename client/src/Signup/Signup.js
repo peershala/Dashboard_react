@@ -207,9 +207,9 @@ function Signup() {
 
           <Box sx={{ display: "flex", flexDirection: "column", height: "5rem", width: "100%", justifyContent: "space-between" }}>
             <ColorButton variant="contained" onClick={submitHandler}>Sign Up</ColorButton>
-            <Link href="#" underline="hover">
+            {/* <Link href="#" underline="hover">
               {'Forget Password?"'}
-            </Link>
+            </Link> */}
             {/* <Box sx={{display:"flex",justifyContent:"space-between"}}>
             </Box> */}
           </Box>

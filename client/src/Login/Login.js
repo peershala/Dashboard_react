@@ -187,11 +187,11 @@ function Login() {
 
           <Box sx={{ display: "flex", flexDirection: "column", height: "5rem", width: "100%", justifyContent: "space-between" }}>
             <ColorButton variant="contained" onClick={submitHandler}>Login</ColorButton>
-            <Link href="#" underline="hover">
-              {'Forget Password?"'}
-            </Link>
-            {/* <Box sx={{display:"flex",justifyContent:"space-between"}}>
-            </Box> */}
+            {/* <Link href="#" underline="hover"> */}
+              {/* {'Forget Password?"'} */}
+            {/* </Link> */}
+            <Box sx={{display:"flex",justifyContent:"space-between"}}>
+            </Box>
           </Box>
 
           <Divider sx={{ color: loginthememode ? "white" : "black", marginY: 3, }}>
@@ -208,11 +208,11 @@ function Login() {
               }} variant="contained" >Sign Up</Button>
           </Box>
 
-          <Divider sx={{ color: loginthememode ? "white" : "black", marginY: 1.5, }}>
+          {/* <Divider sx={{ color: loginthememode ? "white" : "black", marginY: 1.5, }}>
             Or
-          </Divider>
+          </Divider> */}
 
-          <Box width={1} display={"flex"} flexDirection={"column"} >
+          {/* <Box width={1} display={"flex"} flexDirection={"column"} >
 
             <Button width={"100%"} startIcon={<img src={facebook} />} style={{
               borderRadius: "7px", height: "3rem",
@@ -223,7 +223,7 @@ function Login() {
               borderRadius: "7px", height: "3rem",
               marginTop: "1rem", textTransform: "capitalize"
             }} variant="outlined">Sign in with <span style={{ marginLeft: "0.4rem", fontWeight: "bold", color: loginthememode ? "white" : "black" }}>Google</span></Button>
-          </Box>
+          </Box> */}
 
 
         </Box>
