@@ -19,16 +19,20 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Axios from 'axios';
 import { UserContext } from '../context/ContextProvider';
 
-function Login() {
+function Signup() {
 
-
-  const navigate = useNavigate()
+  const d= new Date();
+  const navigate = useNavigate();
 
   const [loginthememode, setloginThememode] = useState(false)
   const [usermail,setmail]=useState('');
   const [userpass,setpass]=useState('');
   const [fname,setfname]=useState('');
   const [lname,setlname]=useState('');
+  // const [cname,setcname]=useState('');
+  const [ctitle1,settitle]=useState('');
+  // const [cdate1,setdate]=useState('');
+  // const [cscore1,setscore]=useState('');
   const [userContext,setUserContext]=useContext(UserContext);
   const genericErrorMessage = "Something went wrong! Please try again later.";
   const [showPassword, setShowPassword] = React.useState(false);
@@ -39,7 +43,15 @@ function Login() {
     // console.log(usermail);
     // console.log(userpass);
     // navigate('/dashboard');
+    const datenum=d.getDate();
+    const datemonth=d.getMonth();
+    const dateyear=d.getFullYear()
 
+    const cdate1=`${datenum}/${datemonth}/${dateyear}`;
+    // setdate(`${datenum}/${datemonth}/${dateyear}`);
+    // setscore("O+");
+    const duration=3;
+    const cname1=fname.concat(" ",lname);
     Axios.post("/register",
     {username:usermail,
     password:userpass
@@ -48,18 +60,14 @@ function Login() {
       // console.log('no error');
       if(response.status==200)
       {
-        // console.log(response.data);
-        // console.log(response.data.user_id);
-        // setUserContext(oldValues => {
-        //   return { ...oldValues, token: response.data }
+        // console.log(cdate1,cscore1);
+        Axios.post('/filestore',{cname:cname1,ctitle:ctitle1,durationtime:duration,cdate:cdate1,uname:usermail}).then(res=>{
+          console.log(`File for  ${usermail} created`);
+        })
+        .catch(e=>{
+          console.log(e);
+        })
 
-        // })
-
-        // try {
-        //   localStorage.setItem("userstore", JSON.stringify(response.data));
-        // } catch (error) {
-        //   console.log(error);
-        // }
         navigate('/');
       }
     })
@@ -85,7 +93,7 @@ function Login() {
 
     // setError(genericErrorMessage)
 
-  })    
+  })
   };
 
 
@@ -181,14 +189,15 @@ function Login() {
 
             <Box sx={{ display: "flex", justifyContent: "space-between", color: loginthememode ? "white" : "black" }}>
               {/* <CssTextField fullWidth label="Name" /> */}
-              <Input type='text' onChange={(e)=>{setfname(e.target.value)}}/>
+              <Input type='text' onChange={(e)=>{setfname(e.target.value)}} placeholder="first name"/>
               <Box width={"3rem"}></Box>
               {/* <CssTextField fullWidth label="Last name" /> */}
-              <Input type='text' onChange={(e)=>{setlname(e.target.value)}}/>
+              <Input type='text' onChange={(e)=>{setlname(e.target.value)}} placeholder="last name"/>
             </Box>
             {/* <CssTextField type="email" fullWidth label="Email" /> */}
-            <Input type='email' onChange={(e)=>{setmail(e.target.value)}}/>
-            <Input type='password' onChange={(e)=>{setpass(e.target.value)}}/>
+            <Input type='email' onChange={(e)=>{setmail(e.target.value)}} placeholder="user name"/>
+            <Input type='text' onChange={(e)=>{settitle(e.target.value)}} placeholder="title"/>
+            <Input type='password' onChange={(e)=>{setpass(e.target.value)}} placeholder="password"/>
 
             {/* <CssTextField  fullWidth label="Password" /> */}
             {/* <CssTextField  fullWidth label="Password" /> */}
@@ -198,9 +207,9 @@ function Login() {
 
           <Box sx={{ display: "flex", flexDirection: "column", height: "5rem", width: "100%", justifyContent: "space-between" }}>
             <ColorButton variant="contained" onClick={submitHandler}>Sign Up</ColorButton>
-            <Link href="#" underline="hover">
+            {/* <Link href="#" underline="hover">
               {'Forget Password?"'}
-            </Link>
+            </Link> */}
             {/* <Box sx={{display:"flex",justifyContent:"space-between"}}>
             </Box> */}
           </Box>
@@ -228,4 +237,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Signup

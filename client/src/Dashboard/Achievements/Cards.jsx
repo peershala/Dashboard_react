@@ -2,9 +2,34 @@ import { Box, Button, Paper, Typography } from '@mui/material'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import React from 'react'
 import { AppState } from '../../context/ContextProvider'
+import Axios  from 'axios';
+
 
 function Cards() {
     const { thememode } = AppState()
+
+
+    const downloadHandler=()=>
+    {
+
+        const id=localStorage.getItem("userstore");
+        const uid=JSON.parse(id);
+        const uname1=uid.username || "nulluser";
+
+
+        Axios.post('/fileget', { file_name: uname1 }, { responseType: 'blob' })
+        .then(res => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `${uname1}.pdf`);
+          document.body.appendChild(link);
+          link.click();
+          link.parentNode.removeChild(link);
+        })
+        .catch(err => console.log(err));
+
+    }
 
     return (
         <>
@@ -47,7 +72,7 @@ function Cards() {
                         background:"#7b1fa2",
                         width: "70%",
                         borderRadius: "7px", height: "3rem", color: "white",
-                    }} variant="contained" >Download</Button>
+                    }} variant="contained"  onClick={downloadHandler}>Download</Button>
                 </Box>
 
             </Paper>
